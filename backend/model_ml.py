@@ -14,6 +14,8 @@ def construieste_set_date(repozitoriu):
                 "luna": d["luna"],
                 "lat": j["latitudine"],
                 "lon": j["longitudine"],
+                "temperatura": d["temperatura"],
+                "viteza_vant": d["viteza_vant"],
                 "ghi": d["ghi"],
             })
     return randuri
@@ -35,7 +37,7 @@ def construieste_profile_judete(repozitoriu):
 
 
 class EstimatorRadiatie:
-    CARACTERISTICI = ["luna", "lat", "lon"]
+    CARACTERISTICI = ["luna", "lat", "lon", "temperatura", "viteza_vant"]
 
     def __init__(self):
         self.model = RandomForestRegressor(n_estimators=150, random_state=42)
@@ -54,9 +56,9 @@ class EstimatorRadiatie:
         self.antrenat = True
         return self
 
-    # Estimeaza GHI pentru o locatie si o luna
-    def estimeaza(self, luna, lat, lon):
-        X = np.array([[luna, lat, lon]], dtype=float)
+    # Estimeaza GHI pentru o locatie, luna si conditii meteo
+    def estimeaza(self, luna, lat, lon, temperatura, viteza_vant):
+        X = np.array([[luna, lat, lon, temperatura, viteza_vant]], dtype=float)
         return float(self.model.predict(X)[0])
 
     # Validare: train/test + cross-validation + comparatie cu baseline sezonier

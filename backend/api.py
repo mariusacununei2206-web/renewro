@@ -114,10 +114,15 @@ def ml_estimare(
     lat: float = Query(..., description="Latitudine"),
     lon: float = Query(..., description="Longitudine"),
     luna: int = Query(..., ge=1, le=12, description="Luna 1-12"),
+    temperatura: float = Query(..., description="Temperatura medie (grade C)"),
+    viteza_vant: float = Query(..., description="Viteza vant (m/s)"),
     repozitoriu: RepozitoriuDate = Depends(get_repozitoriu),
 ):
     est = _get_estimator(repozitoriu)
-    return {"lat": lat, "lon": lon, "luna": luna, "ghi_estimat": est.estimeaza(luna, lat, lon)}
+    return {
+        "lat": lat, "lon": lon, "luna": luna,
+        "ghi_estimat": est.estimeaza(luna, lat, lon, temperatura, viteza_vant),
+    }
 
 
 # Metricile de validare ale estimatorului (R2/MAE/MAPE + baseline)
