@@ -5,6 +5,7 @@ const navItems = [
   { path: '/', label: 'Acasă', icon: '🏠' },
   { path: '/harta', label: 'Vizualizare hartă', icon: '🗺️' },
   { path: '/simulator', label: 'Simulare investiție', icon: '💰' },
+  { path: '/ml', label: 'Model ML', icon: '🤖' },
 ]
 
 export default function Sidebar() {

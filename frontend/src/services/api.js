@@ -23,3 +23,8 @@ export const getSimulare = (judet, putere_kwp, autoconsum, subventie = true) =>
 // Comparatie solar vs eolian
 export const getComparatie = (judet, putere_kwp) =>
   getJSON('/comparatie', { judet, putere_kwp })
+
+// Machine Learning
+export const getValidareML = () => getJSON('/ml/validare')
+export const getClustereML = (n = 3) => getJSON('/ml/clustere', { n })
+export const getEstimareML = (lat, lon, luna) => getJSON('/ml/estimare', { lat, lon, luna })

@@ -6,6 +6,10 @@ from fastapi.responses import RedirectResponse
 
 from repozitoriu_date import RepozitoriuDate
 from serviciu_simulare import ServiciuSimulare
+from model_ml import (
+    EstimatorRadiatie, ClusterizareJudete,
+    construieste_set_date, construieste_profile_judete,
+)
 
 # Aplicatia FastAPI
 app = FastAPI(
@@ -91,3 +95,42 @@ def comparatie(
         return serviciu.compara_solar_eolian(judet, putere_kwp)
     except ValueError as eroare:
         raise HTTPException(status_code=404, detail=str(eroare))
+
+
+# Estimator ML antrenat o singura data (cache global)
+_estimator = None
+
+
+def _get_estimator(repozitoriu):
+    global _estimator
+    if _estimator is None:
+        _estimator = EstimatorRadiatie().antreneaza(construieste_set_date(repozitoriu))
+    return _estimator
+
+
+# Estimeaza GHI pentru o locatie si o luna (Random Forest)
+@app.get("/ml/estimare")
+def ml_estimare(
+    lat: float = Query(..., description="Latitudine"),
+    lon: float = Query(..., description="Longitudine"),
+    luna: int = Query(..., ge=1, le=12, description="Luna 1-12"),
+    repozitoriu: RepozitoriuDate = Depends(get_repozitoriu),
+):
+    est = _get_estimator(repozitoriu)
+    return {"lat": lat, "lon": lon, "luna": luna, "ghi_estimat": est.estimeaza(luna, lat, lon)}
+
+
+# Metricile de validare ale estimatorului (R2/MAE/MAPE + baseline)
+@app.get("/ml/validare")
+def ml_validare(repozitoriu: RepozitoriuDate = Depends(get_repozitoriu)):
+    return EstimatorRadiatie().valideaza(construieste_set_date(repozitoriu))
+
+
+# Clusterizarea judetelor in clase de potential (K-means)
+@app.get("/ml/clustere")
+def ml_clustere(
+    n: int = Query(3, ge=2, le=5, description="Numar de clase"),
+    repozitoriu: RepozitoriuDate = Depends(get_repozitoriu),
+):
+    profile = construieste_profile_judete(repozitoriu)
+    return ClusterizareJudete(n_clustere=n).clusterizeaza(profile)
