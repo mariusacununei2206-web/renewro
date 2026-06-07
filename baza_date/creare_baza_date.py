@@ -53,6 +53,7 @@ PARAMETRI = [
     ("durata_viata", 25, "ani"),  # orizontul financiar
     ("factor_emisie_co2", 0.30, "kg/kWh"),  # (*) factorul retelei romanesti
     ("cost_unitar_kwp", 5000, "lei/kWp"),  # (*) CAPEX orientativ per kWp instalat
+    ("subventie_casa_verde", 20000, "lei"),  # subventia Casa Verde Fotovoltaice
 ]
 
 

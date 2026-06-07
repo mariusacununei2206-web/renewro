@@ -11,6 +11,7 @@ export default function Simulator() {
   const [judet, setJudet] = useState('Iasi')
   const [putereKwp, setPutereKwp] = useState(5)
   const [autoconsum, setAutoconsum] = useState(0.4)
+  const [subventie, setSubventie] = useState(true)
   const [rezultat, setRezultat] = useState(null)
   const [loading, setLoading] = useState(false)
   const [eroare, setEroare] = useState('')
@@ -30,7 +31,7 @@ export default function Simulator() {
     setLoading(true)
     setEroare('')
     try {
-      const date = await getSimulare(judet, putereKwp, autoconsum)
+      const date = await getSimulare(judet, putereKwp, autoconsum, subventie)
       setRezultat(date)
     } catch {
       setEroare('Eroare la calcul. E pornit backend-ul?')
@@ -79,6 +80,13 @@ export default function Simulator() {
                 value={autoconsum} onChange={(e) => setAutoconsum(Number(e.target.value))} />
             </div>
 
+            <div style={styles.formGroup}>
+              <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: 0 }}>
+                <input type="checkbox" checked={subventie} onChange={(e) => setSubventie(e.target.checked)} />
+                Aplică subvenția Casa Verde (−20.000 lei)
+              </label>
+            </div>
+
             {eroare && <div style={styles.eroare}>{eroare}</div>}
 
             <button onClick={calculeaza} style={styles.btnCalcul} disabled={loading}>
@@ -103,6 +111,24 @@ export default function Simulator() {
                     <div style={styles.kpiLabel}>NPV ({rezultat.durata_viata} ani)</div>
                     <div style={styles.kpiVal}>
                       {rezultat.economic.npv > 0 ? '+' : ''}{Math.round(rezultat.economic.npv / 1000)}k lei
+                    </div>
+                  </div>
+                </div>
+
+                <div style={styles.card}>
+                  <div style={styles.cardTitlu}>Investiție</div>
+                  <div style={styles.meteoGrid}>
+                    <div style={styles.meteoItem}>
+                      <span style={styles.meteoLabel}>Cost brut (CAPEX)</span>
+                      <span style={styles.meteoVal}>{Math.round(rezultat.intrari.capex_brut).toLocaleString('ro-RO')} lei</span>
+                    </div>
+                    <div style={styles.meteoItem}>
+                      <span style={styles.meteoLabel}>Subvenție Casa Verde</span>
+                      <span style={styles.meteoVal}>− {Math.round(rezultat.intrari.subventie).toLocaleString('ro-RO')} lei</span>
+                    </div>
+                    <div style={styles.meteoItem}>
+                      <span style={styles.meteoLabel}><strong>Investiție efectivă</strong></span>
+                      <span style={styles.meteoVal}><strong>{Math.round(rezultat.intrari.capex).toLocaleString('ro-RO')} lei</strong></span>
                     </div>
                   </div>
                 </div>

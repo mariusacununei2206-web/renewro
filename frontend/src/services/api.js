@@ -17,8 +17,8 @@ async function getJSON(cale, parametri = {}) {
 export const getJudete = () => getJSON('/judete')
 
 // Simulare completa pentru un judet
-export const getSimulare = (judet, putere_kwp, autoconsum) =>
-  getJSON('/simulare', { judet, putere_kwp, autoconsum })
+export const getSimulare = (judet, putere_kwp, autoconsum, subventie = true) =>
+  getJSON('/simulare', { judet, putere_kwp, autoconsum, subventie })
 
 // Comparatie solar vs eolian
 export const getComparatie = (judet, putere_kwp) =>

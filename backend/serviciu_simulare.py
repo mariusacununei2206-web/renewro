@@ -28,7 +28,7 @@ class ServiciuSimulare:
         }
 
     # Simulare completa pentru un sistem solar intr-un judet
-    def simuleaza(self, nume_judet, putere_kwp, fractie_autoconsum):
+    def simuleaza(self, nume_judet, putere_kwp, fractie_autoconsum, aplica_subventie=True):
         # 1. Adu datele
         judet, date_meteo = self._adu_judet_si_date(nume_judet)
 
@@ -37,8 +37,10 @@ class ServiciuSimulare:
         motor = MotorEconomic(self.parametri)
         risc = AnalizaRisc(solar, motor)
 
-        # 3. Calculeaza
-        capex = putere_kwp * self.parametri["cost_unitar_kwp"]
+        # 3. Calculeaza investitia (CAPEX efectiv = brut - subventie Casa Verde)
+        capex_brut = putere_kwp * self.parametri["cost_unitar_kwp"]
+        subventie = self.parametri.get("subventie_casa_verde", 20000) if aplica_subventie else 0
+        capex = max(0.0, capex_brut - subventie)
         energie = solar.productie_anuala(date_meteo)            # an tipic (media)
         productie_lunara = solar.productie_lunara(date_meteo)   # pentru grafic
         economic = motor.calculeaza_tot(energie, fractie_autoconsum, capex)
@@ -54,7 +56,10 @@ class ServiciuSimulare:
             "intrari": {
                 "putere_kwp": putere_kwp,
                 "fractie_autoconsum": fractie_autoconsum,
+                "capex_brut": capex_brut,
+                "subventie": subventie,
                 "capex": capex,
+                "aplica_subventie": aplica_subventie,
             },
             "durata_viata": motor.durata_viata,
             "energie_anuala": energie,

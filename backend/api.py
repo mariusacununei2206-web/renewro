@@ -71,10 +71,11 @@ def simulare(
     judet: str = Query(..., description="Numele judetului, ex. Iasi"),
     putere_kwp: float = Query(5.0, gt=0, description="Puterea instalata (kWp)"),
     autoconsum: float = Query(0.4, ge=0, le=1, description="Fractia de autoconsum (0..1)"),
+    subventie: bool = Query(True, description="Aplica subventia Casa Verde"),
     serviciu: ServiciuSimulare = Depends(get_serviciu),
 ):
     try:
-        return serviciu.simuleaza(judet, putere_kwp, autoconsum)
+        return serviciu.simuleaza(judet, putere_kwp, autoconsum, aplica_subventie=subventie)
     except ValueError as eroare:
         raise HTTPException(status_code=404, detail=str(eroare))
 
