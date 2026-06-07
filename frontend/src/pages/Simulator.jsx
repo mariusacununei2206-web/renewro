@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
-import { getJudete, getSimulare } from '../services/api.js'
+import { useAuth } from '../context/AuthContext.jsx'
+import { getJudete, getSimulare, salveazaSimulare } from '../services/api.js'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
@@ -15,6 +17,8 @@ export default function Simulator() {
   const [rezultat, setRezultat] = useState(null)
   const [loading, setLoading] = useState(false)
   const [eroare, setEroare] = useState('')
+  const [mesajSalvare, setMesajSalvare] = useState('')
+  const { utilizator } = useAuth()
 
   // Incarca lista judetelor
   useEffect(() => {
@@ -37,6 +41,17 @@ export default function Simulator() {
       setEroare('Eroare la calcul. E pornit backend-ul?')
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Salveaza simularea curenta in profil (necesita autentificare)
+  async function salveaza() {
+    setMesajSalvare('')
+    try {
+      await salveazaSimulare(judet, putereKwp, autoconsum, subventie)
+      setMesajSalvare('✓ Simulare salvată în profil')
+    } catch {
+      setMesajSalvare('Eroare la salvare')
     }
   }
 
@@ -186,6 +201,19 @@ export default function Simulator() {
                     </div>
                   </div>
                 </div>
+
+                <div style={styles.card}>
+                  {utilizator ? (
+                    <>
+                      <button onClick={salveaza} style={styles.btnSalveaza}>💾 Salvează simularea</button>
+                      {mesajSalvare && <span style={{ marginLeft: 12, color: '#1D9E75', fontSize: 13 }}>{mesajSalvare}</span>}
+                    </>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: 13, color: '#666' }}>
+                      <Link to="/login" style={{ color: '#1D9E75', fontWeight: 600 }}>Conectează-te</Link> ca să salvezi simularea în profil.
+                    </p>
+                  )}
+                </div>
               </>
             ) : (
               <div style={styles.emptyState}>
@@ -232,4 +260,5 @@ const styles = {
   emptyState: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', background: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
   emptyIcon: { fontSize: '48px', marginBottom: '16px' },
   emptyText: { fontSize: '14px', color: '#888', textAlign: 'center', lineHeight: '1.6' },
+  btnSalveaza: { padding: '10px 18px', background: '#1D9E75', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' },
 }
