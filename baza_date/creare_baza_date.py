@@ -28,6 +28,25 @@ CREATE TABLE IF NOT EXISTS parametri_economici (
     valoare      NUMERIC     NOT NULL,
     unitate      VARCHAR(20)
 );
+
+CREATE TABLE IF NOT EXISTS utilizatori (
+    id_utilizator SERIAL PRIMARY KEY,
+    email         VARCHAR(120) NOT NULL UNIQUE,
+    parola_hash   VARCHAR(200) NOT NULL,
+    nume          VARCHAR(100),
+    data_creare   TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS simulari_salvate (
+    id_simulare   SERIAL PRIMARY KEY,
+    id_utilizator INTEGER NOT NULL REFERENCES utilizatori(id_utilizator),
+    judet         VARCHAR(50),
+    putere_kwp    NUMERIC(6,2),
+    autoconsum    NUMERIC(4,3),
+    npv           NUMERIC,
+    rezultat      JSONB,
+    data_creare   TIMESTAMP DEFAULT now()
+);
 """
 
 # 2. Datele de referinta

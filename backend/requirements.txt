@@ -2,3 +2,5 @@ psycopg2-binary
 fastapi[standard]
 scikit-learn
 numpy
+bcrypt
+python-jose[cryptography]

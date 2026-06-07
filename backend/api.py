@@ -11,6 +11,13 @@ from model_ml import (
     construieste_set_date, construieste_profile_judete,
 )
 
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel
+from jose import JWTError
+
+import autentificare
+from repozitoriu_utilizatori import RepozitoriuUtilizatori
+
 # Aplicatia FastAPI
 app = FastAPI(
     title="RenewRO API",
@@ -49,6 +56,37 @@ def get_repozitoriu(conexiune=Depends(get_conexiune)):
 # Dependency: serviciul de simulare peste repozitoriu
 def get_serviciu(repozitoriu=Depends(get_repozitoriu)):
     return ServiciuSimulare(repozitoriu)
+
+
+# Schema OAuth2 (token in header: Authorization: Bearer ...)
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="login")
+
+
+# Dependency: repozitoriul de utilizatori
+def get_repo_utilizatori(conexiune=Depends(get_conexiune)):
+    return RepozitoriuUtilizatori(conexiune)
+
+
+# Dependency: utilizatorul curent (din token) - protejeaza rutele
+def get_utilizator_curent(
+    token: str = Depends(oauth2_schema),
+    repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori),
+):
+    eroare = HTTPException(
+        status_code=401, detail="Token invalid sau expirat",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        date = autentificare.decodeaza_token(token)
+        email = date.get("sub")
+    except JWTError:
+        raise eroare
+    if email is None:
+        raise eroare
+    utilizator = repo_u.get_utilizator_dupa_email(email)
+    if utilizator is None:
+        raise eroare
+    return utilizator
 
 
 # Pagina principala: redirect catre documentatia interactiva
@@ -139,3 +177,81 @@ def ml_clustere(
 ):
     profile = construieste_profile_judete(repozitoriu)
     return ClusterizareJudete(n_clustere=n).clusterizeaza(profile)
+
+
+# ---- Modele de intrare (Pydantic) ----
+class Inregistrare(BaseModel):
+    email: str
+    parola: str
+    nume: str | None = None
+
+
+class SimulareNoua(BaseModel):
+    judet: str
+    putere_kwp: float = 5.0
+    autoconsum: float = 0.4
+    subventie: bool = True
+
+
+# Inregistrare cont nou (intoarce token)
+@app.post("/register")
+def register(date: Inregistrare, repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori)):
+    if repo_u.get_utilizator_dupa_email(date.email):
+        raise HTTPException(status_code=400, detail="Email deja inregistrat")
+    parola_hash = autentificare.hash_parola(date.parola)
+    repo_u.creeaza_utilizator(date.email, parola_hash, date.nume)
+    token = autentificare.creeaza_token({"sub": date.email})
+    return {"access_token": token, "token_type": "bearer"}
+
+
+# Autentificare (intoarce token JWT)
+@app.post("/login")
+def login(
+    formular: OAuth2PasswordRequestForm = Depends(),
+    repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori),
+):
+    utilizator = repo_u.get_utilizator_dupa_email(formular.username)
+    if utilizator is None or not autentificare.verifica_parola(formular.password, utilizator["parola_hash"]):
+        raise HTTPException(status_code=401, detail="Email sau parola gresita")
+    token = autentificare.creeaza_token({"sub": utilizator["email"]})
+    return {"access_token": token, "token_type": "bearer"}
+
+
+# Profilul utilizatorului curent (protejat)
+@app.get("/profil")
+def profil(utilizator=Depends(get_utilizator_curent)):
+    return {
+        "id_utilizator": utilizator["id_utilizator"],
+        "email": utilizator["email"],
+        "nume": utilizator["nume"],
+    }
+
+
+# Salveaza o simulare pentru utilizatorul curent (protejat)
+@app.post("/simulari")
+def salveaza_simulare(
+    date: SimulareNoua,
+    utilizator=Depends(get_utilizator_curent),
+    serviciu: ServiciuSimulare = Depends(get_serviciu),
+    repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori),
+):
+    try:
+        rezultat = serviciu.simuleaza(
+            date.judet, date.putere_kwp, date.autoconsum, aplica_subventie=date.subventie
+        )
+    except ValueError as eroare:
+        raise HTTPException(status_code=404, detail=str(eroare))
+    id_simulare = repo_u.salveaza_simulare(
+        utilizator["id_utilizator"], date.judet, date.putere_kwp,
+        date.autoconsum, rezultat["economic"]["npv"], rezultat,
+    )
+    return {"id_simulare": id_simulare, "rezultat": rezultat}
+
+
+# Listeaza simularile salvate ale utilizatorului curent (protejat)
+@app.get("/simulari")
+def listeaza_simulari(
+    utilizator=Depends(get_utilizator_curent),
+    repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori),
+):
+    return repo_u.get_simulari(utilizator["id_utilizator"])
