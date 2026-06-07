@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Harta from './pages/Harta.jsx'
 import Simulator from './pages/Simulator.jsx'
+import Comparatii from './pages/Comparatii.jsx'
 import ModelML from './pages/ModelML.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/harta" element={<Harta />} />
           <Route path="/simulator" element={<Simulator />} />
+          <Route path="/comparatii" element={<Comparatii />} />
           <Route path="/ml" element={<ModelML />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
