@@ -1,0 +1,24 @@
+# Medii virtuale Python (fiecare proiect isi recreeaza .venv din requirements.txt)
+.venv/
+**/.venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Config IDE
+.idea/
+.vscode/
+
+# Frontend (React)
+node_modules/
+dist/
+build/
+
+# Variabile de mediu locale (NICIODATA parole in repo)
+.env
+
+# Fisiere de tooling AI (raman locale, NU ajung in repo / la comisie)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
