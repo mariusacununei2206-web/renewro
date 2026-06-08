@@ -4,3 +4,4 @@ scikit-learn
 numpy
 bcrypt
 python-jose[cryptography]
+python-dotenv

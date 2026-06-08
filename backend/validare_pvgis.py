@@ -3,8 +3,13 @@ import time
 import json
 import urllib.parse
 import urllib.request
+from pathlib import Path
+from dotenv import load_dotenv
 
 import psycopg2
+
+# Incarca variabilele de mediu din fisierul .env (radacina proiectului)
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 from repozitoriu_date import RepozitoriuDate
 from modele_productie import ModelProductieSolar
 

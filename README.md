@@ -34,21 +34,21 @@ RenewRO/
 ### 1. Baza de date
 Creează în PostgreSQL o bază goală numită `renewro`.
 
-### 2. Variabile de mediu
-Aplicația citește credențialele din variabile de mediu — **nicio parolă nu e în cod**.
-Setează-le cu valorile **tale** de PostgreSQL:
-
-| Variabilă | Exemplu |
-|---|---|
-| `RENEWRO_DB_HOST` | `localhost` |
-| `RENEWRO_DB_NAME` | `renewro` |
-| `RENEWRO_DB_USER` | `postgres` |
-| `RENEWRO_DB_PASSWORD` | *(parola ta de PostgreSQL)* |
-
-În PowerShell (pe sesiunea curentă):
+### 2. Variabile de mediu (fișierul `.env`)
+Aplicația citește credențialele dintr-un fișier `.env` — **nicio parolă nu e în cod**.
+Copiază `.env.example` în `.env` și completează cu datele **tale** de PostgreSQL:
 ```powershell
-$env:RENEWRO_DB_HOST="localhost"; $env:RENEWRO_DB_NAME="renewro"; $env:RENEWRO_DB_USER="postgres"; $env:RENEWRO_DB_PASSWORD="PAROLA_TA"
+copy .env.example .env
 ```
+Apoi editează `.env`:
+```
+RENEWRO_DB_HOST=localhost
+RENEWRO_DB_NAME=renewro
+RENEWRO_DB_USER=postgres
+RENEWRO_DB_PASSWORD=parola_ta_de_postgres
+```
+Fișierul `.env` e ignorat de Git (nu ajunge în repo), deci fiecare folosește propriile credențiale.
+Scripturile îl citesc automat — **nu mai trebuie setate variabile în terminal**.
 
 ### 3. Stratul de date (se rulează O SINGURĂ DATĂ)
 ```powershell

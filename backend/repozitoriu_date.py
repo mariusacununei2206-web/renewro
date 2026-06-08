@@ -1,5 +1,10 @@
 import os
 import psycopg2
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Incarca variabilele de mediu din fisierul .env (radacina proiectului)
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 
 class RepozitoriuDate:
