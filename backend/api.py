@@ -6,10 +6,8 @@ from fastapi.responses import RedirectResponse
 
 from repozitoriu_date import RepozitoriuDate
 from serviciu_simulare import ServiciuSimulare
-from model_ml import (
-    EstimatorRadiatie, ClusterizareJudete,
-    construieste_set_date, construieste_profile_judete,
-)
+# model_ml (scikit-learn) se importa LAZY in endpoint-uri (vezi _modul_ml),
+# ca backend-ul sa porneasca si daca sklearn e blocat de politici de securitate.
 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
@@ -135,6 +133,15 @@ def comparatie(
         raise HTTPException(status_code=404, detail=str(eroare))
 
 
+# Incarca modulul ML lazy; daca sklearn e blocat, doar rutele /ml/* esueaza
+def _modul_ml():
+    try:
+        import model_ml
+        return model_ml
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Modulul ML indisponibil (scikit-learn): {e}")
+
+
 # Estimator ML antrenat o singura data (cache global)
 _estimator = None
 
@@ -142,7 +149,8 @@ _estimator = None
 def _get_estimator(repozitoriu):
     global _estimator
     if _estimator is None:
-        _estimator = EstimatorRadiatie().antreneaza(construieste_set_date(repozitoriu))
+        ml = _modul_ml()
+        _estimator = ml.EstimatorRadiatie().antreneaza(ml.construieste_set_date(repozitoriu))
     return _estimator
 
 
@@ -166,7 +174,8 @@ def ml_estimare(
 # Metricile de validare ale estimatorului (R2/MAE/MAPE + baseline)
 @app.get("/ml/validare")
 def ml_validare(repozitoriu: RepozitoriuDate = Depends(get_repozitoriu)):
-    return EstimatorRadiatie().valideaza(construieste_set_date(repozitoriu))
+    ml = _modul_ml()
+    return ml.EstimatorRadiatie().valideaza(ml.construieste_set_date(repozitoriu))
 
 
 # Clusterizarea judetelor in clase de potential (K-means)
@@ -175,8 +184,9 @@ def ml_clustere(
     n: int = Query(3, ge=2, le=5, description="Numar de clase"),
     repozitoriu: RepozitoriuDate = Depends(get_repozitoriu),
 ):
-    profile = construieste_profile_judete(repozitoriu)
-    return ClusterizareJudete(n_clustere=n).clusterizeaza(profile)
+    ml = _modul_ml()
+    profile = ml.construieste_profile_judete(repozitoriu)
+    return ml.ClusterizareJudete(n_clustere=n).clusterizeaza(profile)
 
 
 # ---- Modele de intrare (Pydantic) ----
