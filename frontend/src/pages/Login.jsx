@@ -21,7 +21,7 @@ export default function Login() {
       navigate('/')
     } catch (error) {
       console.log('Eroare login:', error)
-      setEroare('Email sau parolă incorectă. Încearcă din nou.')
+      setEroare(error.message || 'Email sau parolă incorectă.')
     } finally {
       setLoading(false)
     }

@@ -22,7 +22,7 @@ export default function Register() {
       navigate('/')
     } catch (error) {
       console.log('Eroare register:', error)
-      setEroare('Nu s-a putut crea contul. Poate emailul e deja folosit.')
+      setEroare(error.message || 'Nu s-a putut crea contul.')
     } finally {
       setLoading(false)
     }
