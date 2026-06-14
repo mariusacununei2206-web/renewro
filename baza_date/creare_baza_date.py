@@ -50,8 +50,11 @@ CREATE TABLE IF NOT EXISTS simulari_salvate (
     autoconsum    NUMERIC(4,3),
     npv           NUMERIC,
     rezultat      JSONB,
+    principala    BOOLEAN DEFAULT FALSE,
     data_creare   TIMESTAMP DEFAULT now()
 );
+
+ALTER TABLE simulari_salvate ADD COLUMN IF NOT EXISTS principala BOOLEAN DEFAULT FALSE;
 """
 
 # 2. Datele de referinta

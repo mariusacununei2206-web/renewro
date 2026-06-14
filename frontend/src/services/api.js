@@ -67,3 +67,5 @@ export const getProfil = () => getJSON('/profil')
 export const getSimulari = () => getJSON('/simulari')
 export const salveazaSimulare = (judet, putere_kwp, autoconsum, subventie = true) =>
   postJSON('/simulari', { judet, putere_kwp, autoconsum, subventie })
+export const getSimularePrincipala = () => getJSON('/simulari/principala')
+export const seteazaPrincipala = (id) => postJSON(`/simulari/${id}/principala`, {})

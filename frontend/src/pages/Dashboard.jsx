@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Layout from '../components/Layout.jsx'
-import { getSimulare } from '../services/api.js'
+import { getSimulare, getSimularePrincipala } from '../services/api.js'
+import { useAuth } from '../context/AuthContext.jsx'
 import { IconSoare, IconTermometru, IconVant, IconCalendar } from '../components/Icoane.jsx'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -10,16 +11,31 @@ const LUNI = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun',
               'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec']
 
 export default function Dashboard() {
+  const { utilizator, gata } = useAuth()
   const [r, setR] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // La pornire: o simulare implicita (Iasi, 5 kWp, autoconsum 40%)
+  // La pornire: simularea principala (daca esti logat si ai una), altfel Iasi 5 kWp
   useEffect(() => {
-    getSimulare('Iasi', 5, 0.4)
-      .then(setR)
-      .catch((e) => console.error(e))
-      .finally(() => setLoading(false))
-  }, [])
+    if (!gata) return
+    let activ = true
+    async function incarca() {
+      try {
+        if (utilizator) {
+          const p = await getSimularePrincipala()
+          if (p && p.rezultat) { if (activ) setR(p.rezultat); return }
+        }
+        const def = await getSimulare('Iasi', 5, 0.4)
+        if (activ) setR(def)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        if (activ) setLoading(false)
+      }
+    }
+    incarca()
+    return () => { activ = false }
+  }, [gata, utilizator])
 
   const ora = new Date().getHours()
   const salut = ora < 12 ? 'Bună dimineața' : ora < 18 ? 'Bună ziua' : 'Bună seara'
@@ -31,6 +47,8 @@ export default function Dashboard() {
     : []
 
   const copaci = r ? Math.round(r.economic.co2_evitat_anual / 21) : 0
+  const nume = r?.judet?.nume || 'Iași'
+  const putere = r?.intrari?.putere_kwp ?? 5
 
   return (
     <Layout>
@@ -38,7 +56,7 @@ export default function Dashboard() {
         <div style={styles.header}>
           <div>
             <h1 style={styles.titlu}>{salut}!</h1>
-            <p style={styles.subtitlu}>Situația pentru un sistem de 5 kWp în Iași</p>
+            <p style={styles.subtitlu}>Situația pentru un sistem de {putere} kWp în {nume}</p>
           </div>
           <div style={styles.dataAzi}>
             {new Date().toLocaleDateString('ro-RO', {
@@ -55,7 +73,7 @@ export default function Dashboard() {
 
         <div style={styles.row2}>
           <div style={styles.card}>
-            <div style={styles.cardTitle}>Producție lunară — Iași (kWh)</div>
+            <div style={styles.cardTitle}>Producție lunară — {nume} (kWh)</div>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={dateGrafic}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -68,7 +86,7 @@ export default function Dashboard() {
           </div>
 
           <div style={styles.card}>
-            <div style={styles.cardTitle}>Date meteo medii — Iași (2005–2025)</div>
+            <div style={styles.cardTitle}>Date meteo medii — {nume} (2005–2025)</div>
             {loading ? (
               <div style={styles.loading}>Se încarcă datele…</div>
             ) : r ? (
@@ -88,7 +106,7 @@ export default function Dashboard() {
           <div style={styles.cardTitle}>Recomandarea zilei</div>
           <div style={styles.recBox}>
             {r
-              ? `Iașiul are un potențial solar de ${r.meteo.ghi.toFixed(2)} kWh/m²/zi. Un sistem de 5 kWp produce ~${Math.round(r.energie_anuala)} kWh/an, cu un NPV de ${Math.round(r.economic.npv).toLocaleString('ro-RO')} lei pe ${r.durata_viata} ani. Lunile mai–august sunt optime; orientare sud, înclinare ~35°.`
+              ? `${nume} are un potențial solar de ${r.meteo.ghi.toFixed(2)} kWh/m²/zi. Un sistem de ${putere} kWp produce ~${Math.round(r.energie_anuala)} kWh/an, cu un NPV de ${Math.round(r.economic.npv).toLocaleString('ro-RO')} lei pe ${r.durata_viata} ani. Lunile mai–august sunt optime; orientare sud, înclinare ~35°.`
               : 'Se încarcă recomandarea…'}
           </div>
         </div>

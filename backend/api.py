@@ -271,3 +271,23 @@ def listeaza_simulari(
     repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori),
 ):
     return repo_u.get_simulari(utilizator["id_utilizator"])
+
+
+# Simularea principala a utilizatorului (afisata pe Acasa); null daca nu exista
+@app.get("/simulari/principala")
+def simulare_principala(
+    utilizator=Depends(get_utilizator_curent),
+    repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori),
+):
+    return repo_u.get_principala(utilizator["id_utilizator"])
+
+
+# Marcheaza o simulare salvata ca principala
+@app.post("/simulari/{id_simulare}/principala")
+def seteaza_simulare_principala(
+    id_simulare: int,
+    utilizator=Depends(get_utilizator_curent),
+    repo_u: RepozitoriuUtilizatori = Depends(get_repo_utilizatori),
+):
+    repo_u.seteaza_principala(utilizator["id_utilizator"], id_simulare)
+    return {"ok": True}

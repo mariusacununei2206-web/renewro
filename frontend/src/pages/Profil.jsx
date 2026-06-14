@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Layout from '../components/Layout.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { getSimulari } from '../services/api.js'
+import { getSimulari, seteazaPrincipala } from '../services/api.js'
 
 export default function Profil() {
   const { utilizator } = useAuth()
@@ -14,6 +14,16 @@ export default function Profil() {
       .catch((e) => console.error(e))
       .finally(() => setLoading(false))
   }, [])
+
+  // Marcheaza o simulare ca principala, apoi reincarca lista
+  async function facePrincipala(id) {
+    try {
+      await seteazaPrincipala(id)
+      setSimulari(await getSimulari())
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   return (
     <Layout>
@@ -31,6 +41,7 @@ export default function Profil() {
 
         <div style={styles.card}>
           <div style={styles.cardTitlu}>Simulările mele salvate</div>
+          <p style={styles.hint}>Cea marcată „principală" apare pe pagina Acasă.</p>
           {loading ? (
             <p style={styles.gol}>Se încarcă…</p>
           ) : simulari.length === 0 ? (
@@ -45,6 +56,11 @@ export default function Profil() {
                 </span>
                 <span style={styles.simNpv}>NPV {Math.round(s.npv).toLocaleString('ro-RO')} lei</span>
                 <span style={styles.simData}>{s.data?.slice(0, 10)}</span>
+                {s.principala ? (
+                  <span style={styles.principalaBadge}>★ Principală</span>
+                ) : (
+                  <button style={styles.btnPrincipala} onClick={() => facePrincipala(s.id_simulare)}>Fă principală</button>
+                )}
               </div>
             ))
           )}
@@ -69,4 +85,7 @@ const styles = {
   simJudet: { flex: 1, color: '#444' },
   simNpv: { color: '#1D9E75', fontWeight: 600 },
   simData: { color: '#aaa', fontSize: '12px', width: '90px', textAlign: 'right' },
+  hint: { fontSize: '12px', color: '#aaa', margin: '-8px 0 14px' },
+  principalaBadge: { fontSize: '11px', fontWeight: 700, color: '#0F6E56', background: '#E1F5EE', borderRadius: '6px', padding: '5px 10px', whiteSpace: 'nowrap' },
+  btnPrincipala: { fontSize: '11px', color: '#1D9E75', background: '#fff', border: '1.5px solid #1D9E75', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer', whiteSpace: 'nowrap' },
 }
