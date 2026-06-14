@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Layout from '../components/Layout.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getJudete, getSimulare, salveazaSimulare } from '../services/api.js'
+import { IconSoare, IconTermometru, IconVant, IconBani, IconSalveaza } from '../components/Icoane.jsx'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
@@ -184,19 +185,19 @@ export default function Simulator() {
                   <div style={styles.cardTitlu}>Date meteo utilizate — {rezultat.judet.nume}</div>
                   <div style={styles.meteoGrid}>
                     <div style={styles.meteoItem}>
-                      <span style={styles.meteoLabel}>☀️ Radiație solară</span>
+                      <span style={styles.meteoLabel}><IconSoare /> Radiație solară</span>
                       <span style={styles.meteoVal}>{rezultat.meteo.ghi.toFixed(2)} kWh/m²/zi</span>
                     </div>
                     <div style={styles.meteoItem}>
-                      <span style={styles.meteoLabel}>🌡️ Temperatură medie</span>
+                      <span style={styles.meteoLabel}><IconTermometru /> Temperatură medie</span>
                       <span style={styles.meteoVal}>{rezultat.meteo.temperatura.toFixed(1)} °C</span>
                     </div>
                     <div style={styles.meteoItem}>
-                      <span style={styles.meteoLabel}>💨 Vânt mediu</span>
+                      <span style={styles.meteoLabel}><IconVant /> Vânt mediu</span>
                       <span style={styles.meteoVal}>{rezultat.meteo.viteza_vant.toFixed(2)} m/s</span>
                     </div>
                     <div style={styles.meteoItem}>
-                      <span style={styles.meteoLabel}>💰 LCOE</span>
+                      <span style={styles.meteoLabel}><IconBani /> LCOE</span>
                       <span style={styles.meteoVal}>{rezultat.economic.lcoe.toFixed(3)} lei/kWh</span>
                     </div>
                   </div>
@@ -205,7 +206,7 @@ export default function Simulator() {
                 <div style={styles.card}>
                   {utilizator ? (
                     <>
-                      <button onClick={salveaza} style={styles.btnSalveaza}>💾 Salvează simularea</button>
+                      <button onClick={salveaza} style={styles.btnSalveaza}><IconSalveaza /> Salvează simularea</button>
                       {mesajSalvare && <span style={{ marginLeft: 12, color: '#1D9E75', fontSize: 13 }}>{mesajSalvare}</span>}
                     </>
                   ) : (

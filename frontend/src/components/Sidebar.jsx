@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import logo from '../assets/logo1.png'
 import { useAuth } from '../context/AuthContext.jsx'
 import { IconAcasa, IconHarta, IconSimulare, IconComparatii, IconML, IconProfil } from './Icoane.jsx'
+import WidgetVreme from './WidgetVreme.jsx'
 
 const navItems = [
   { path: '/', label: 'Acasă', Icon: IconAcasa },
@@ -45,6 +46,8 @@ export default function Sidebar() {
           </NavLink>
         )}
       </nav>
+
+      <WidgetVreme />
 
       <div style={styles.footer}>
         <div style={styles.footerDate}>{azi}</div>

@@ -58,7 +58,7 @@ export default function ModelML() {
           <p style={styles.subtitlu}>Estimarea radiației (supervizat) + clasificarea județelor (nesupervizat)</p>
         </div>
 
-        {eroare && <p style={styles.eroare}>⚠️ {eroare} (e pornit backend-ul?)</p>}
+        {eroare && <p style={styles.eroare}>{eroare} (e pornit backend-ul?)</p>}
         {loading && <p style={styles.loading}>Se antrenează modelul…</p>}
 
         {validare && (

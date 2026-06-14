@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import Layout from '../components/Layout.jsx'
 import { getJudete, getComparatie } from '../services/api.js'
 import * as d3 from 'd3'
+import { IconSoare, IconVant } from '../components/Icoane.jsx'
 
 const TIPURI = [
-  { key: 'solar_kwh', label: '☀️ Solar', unitate: 'kWh/an' },
-  { key: 'eolian_kwh', label: '💨 Eolian', unitate: 'kWh/an' },
+  { key: 'solar_kwh', label: 'Solar', Icon: IconSoare, unitate: 'kWh/an' },
+  { key: 'eolian_kwh', label: 'Eolian', Icon: IconVant, unitate: 'kWh/an' },
 ]
 
 // Culoare in functie de pozitia valorii intre min si max
@@ -93,7 +94,7 @@ export default function Harta() {
           {TIPURI.map((t) => (
             <button key={t.key} onClick={() => setTip(t.key)}
               style={{ ...styles.tipBtn, ...(tip === t.key ? styles.tipBtnActiv : {}) }}>
-              {t.label}
+              <t.Icon /> {t.label}
             </button>
           ))}
         </div>
@@ -109,11 +110,11 @@ export default function Harta() {
               {selectat?.date ? (
                 <div style={styles.infoList}>
                   <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>☀️ Producție solară</span>
+                    <span style={styles.infoLabel}><IconSoare /> Producție solară</span>
                     <span style={styles.infoVal}>{Math.round(selectat.date.solar_kwh).toLocaleString('ro-RO')} kWh/an</span>
                   </div>
                   <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>💨 Producție eoliană</span>
+                    <span style={styles.infoLabel}><IconVant /> Producție eoliană</span>
                     <span style={styles.infoVal}>{Math.round(selectat.date.eolian_kwh).toLocaleString('ro-RO')} kWh/an</span>
                   </div>
                 </div>

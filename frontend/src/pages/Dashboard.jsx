@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Layout from '../components/Layout.jsx'
 import { getSimulare } from '../services/api.js'
+import { IconSoare, IconTermometru, IconVant, IconCalendar } from '../components/Icoane.jsx'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
@@ -72,10 +73,10 @@ export default function Dashboard() {
               <div style={styles.loading}>Se încarcă datele…</div>
             ) : r ? (
               <div style={styles.meteoList}>
-                <Row label="☀️ Radiație solară (GHI)" val={`${r.meteo.ghi.toFixed(2)} kWh/m²/zi`} />
-                <Row label="🌡️ Temperatură medie" val={`${r.meteo.temperatura.toFixed(1)} °C`} />
-                <Row label="💨 Viteza vântului" val={`${r.meteo.viteza_vant.toFixed(2)} m/s`} />
-                <Row label="📅 Orizont analiză" val={`${r.durata_viata} ani`} />
+                <Row label={<><IconSoare /> Radiație solară (GHI)</>} val={`${r.meteo.ghi.toFixed(2)} kWh/m²/zi`} />
+                <Row label={<><IconTermometru /> Temperatură medie</>} val={`${r.meteo.temperatura.toFixed(1)} °C`} />
+                <Row label={<><IconVant /> Viteza vântului</>} val={`${r.meteo.viteza_vant.toFixed(2)} m/s`} />
+                <Row label={<><IconCalendar /> Orizont analiză</>} val={`${r.durata_viata} ani`} />
               </div>
             ) : (
               <div style={styles.loading}>Nu s-au putut încărca datele (e pornit backend-ul?).</div>
