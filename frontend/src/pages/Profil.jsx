@@ -59,7 +59,7 @@ export default function Profil() {
                 {s.principala ? (
                   <span style={styles.principalaBadge}>★ Principală</span>
                 ) : (
-                  <button style={styles.btnPrincipala} onClick={() => facePrincipala(s.id_simulare)}>Fă principală</button>
+                  <button style={styles.btnPrincipala} onClick={() => facePrincipala(s.id_simulare)}>Setează ca simulare principală</button>
                 )}
               </div>
             ))

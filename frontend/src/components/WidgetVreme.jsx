@@ -26,6 +26,7 @@ const COD_VREME = {
 export default function WidgetVreme() {
   const [judet, setJudet] = useState(JUDETE.find((j) => j.nume === 'Iasi'))
   const [vreme, setVreme] = useState(null)
+  const azi = new Date().toLocaleDateString('ro-RO')
 
   // Ia vremea de azi pentru judetul selectat (Open-Meteo)
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function WidgetVreme() {
 
   return (
     <div style={styles.box}>
-      <div style={styles.titlu}>Vremea azi</div>
+      <div style={styles.titlu}>Vremea astăzi, {azi}</div>
       <select
         style={styles.select}
         value={judet.nume}
@@ -66,8 +67,8 @@ export default function WidgetVreme() {
 
 const styles = {
   box: { margin: '0 12px 12px', padding: '12px', background: 'rgba(255,255,255,0.12)', borderRadius: '10px' },
-  titlu: { color: 'rgba(255,255,255,0.85)', fontSize: '10px', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.6px' },
-  select: { width: '100%', padding: '6px 8px', borderRadius: '6px', border: 'none', fontSize: '12px', background: 'rgba(255,255,255,0.92)', color: '#1a1a1a', marginBottom: '10px', cursor: 'pointer' },
+  titlu: { color: 'rgba(255,255,255,0.9)', fontSize: '12px', fontWeight: 600, marginBottom: '10px' },
+  select: { width: '100%', padding: '9px 12px', borderRadius: '8px', border: 'none', fontSize: '13px', background: 'rgba(255,255,255,0.92)', color: '#1a1a1a', marginBottom: '10px', cursor: 'pointer' },
   continut: { display: 'flex', alignItems: 'center', gap: '12px' },
   temp: { color: '#fff', fontSize: '28px', fontWeight: 700, lineHeight: 1 },
   detalii: { color: 'rgba(255,255,255,0.85)', fontSize: '11px', lineHeight: 1.5 },

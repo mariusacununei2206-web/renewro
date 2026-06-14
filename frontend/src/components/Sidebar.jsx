@@ -14,9 +14,6 @@ const navItems = [
 
 export default function Sidebar() {
   const { utilizator, logout } = useAuth()
-  const azi = new Date().toLocaleDateString('ro-RO', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
 
   return (
     <div style={styles.sidebar}>
@@ -50,7 +47,6 @@ export default function Sidebar() {
       <WidgetVreme />
 
       <div style={styles.footer}>
-        <div style={styles.footerDate}>{azi}</div>
         {utilizator ? (
           <>
             <div style={styles.footerUser}>{utilizator.nume || utilizator.email}</div>
